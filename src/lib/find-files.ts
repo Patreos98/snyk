@@ -3,7 +3,7 @@ import * as pathLib from 'path';
 import * as _ from '@snyk/lodash';
 import { detectPackageManagerFromFile } from './detect';
 import * as debugModule from 'debug';
-const debug = debugModule('snyk');
+const debug = debugModule('snyk:find-files');
 
 // TODO: use util.promisify once we move to node 8
 
@@ -106,8 +106,12 @@ async function findInDirectory(
   const toFind = files
     .filter((file) => !ignore.includes(file))
     .map((file) => {
-      const resolvedPath = pathLib.resolve(path, file);
-      return find(resolvedPath, ignore, filter, levelsDeep);
+      if (fs.existsSync(pathLib.join(path, file))) {
+        const resolvedPath = pathLib.resolve(path, file);
+        return find(resolvedPath, ignore, filter, levelsDeep);
+      } else {
+        debug('File does not seem to exist, skipping: ', file);
+      }
     });
   const found = await Promise.all(toFind);
   return Array.prototype.concat.apply([], found);
