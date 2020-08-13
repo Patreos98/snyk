@@ -45,6 +45,7 @@ export interface Options {
   path: string;
   docker?: boolean;
   iac?: boolean;
+  source?: boolean; // C/C++ Ecosystem Support
   file?: string;
   policy?: string;
   json?: boolean;
@@ -167,8 +168,7 @@ export type SupportedUserReachableFacingCliArgs =
   | 'reachable-timeout'
   | 'reachable-vulns-timeout'
   | 'integration-name'
-  | 'integration-version'
-  | 'deps-source-dir';
+  | 'integration-version';
 
 export enum SupportedCliCommands {
   version = 'version',
