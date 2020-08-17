@@ -110,8 +110,12 @@ async function findInDirectory(
       return find(resolvedPath, ignore, filter, levelsDeep);
     });
   const found = await Promise.all(toFind);
-  console.log('*** ', found);
-  return { files: Array.prototype.concat.apply([], found) };
+  return {
+    files: Array.prototype.concat.apply(
+      [],
+      found.map((f) => f.files),
+    ),
+  };
 }
 
 function filterForDefaultManifests(files: string[]): string[] {
