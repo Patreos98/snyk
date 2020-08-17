@@ -52,11 +52,11 @@ export async function find(
   ignore: string[] = [],
   filter: string[] = [],
   levelsDeep = 4,
-): Promise<string[]> {
+): Promise<{ files: string[] }> {
   const found: string[] = [];
   // ensure we ignore find against node_modules path.
   if (path.endsWith('node_modules')) {
-    return found;
+    return { files: found };
   }
   // ensure node_modules is always ignored
   if (!ignore.includes('node_modules')) {
@@ -64,13 +64,13 @@ export async function find(
   }
   try {
     if (levelsDeep < 0) {
-      return found;
+      return { files: found };
     } else {
       levelsDeep--;
     }
     const fileStats = await getStats(path);
     if (fileStats.isDirectory()) {
-      const files = await findInDirectory(path, ignore, filter, levelsDeep);
+      const { files } = await findInDirectory(path, ignore, filter, levelsDeep);
       found.push(...files);
     } else if (fileStats.isFile()) {
       const fileFound = findFile(path, filter);
@@ -78,7 +78,7 @@ export async function find(
         found.push(fileFound);
       }
     }
-    return filterForDefaultManifests(found);
+    return { files: filterForDefaultManifests(found) };
   } catch (err) {
     throw new Error(`Error finding files in path '${path}'.\n${err.message}`);
   }
@@ -101,7 +101,7 @@ async function findInDirectory(
   ignore: string[] = [],
   filter: string[] = [],
   levelsDeep = 4,
-): Promise<string[]> {
+): Promise<{ files: string[] }> {
   const files = await readDirectory(path);
   const toFind = files
     .filter((file) => !ignore.includes(file))
@@ -110,7 +110,8 @@ async function findInDirectory(
       return find(resolvedPath, ignore, filter, levelsDeep);
     });
   const found = await Promise.all(toFind);
-  return Array.prototype.concat.apply([], found);
+  console.log('*** ', found);
+  return { files: Array.prototype.concat.apply([], found) };
 }
 
 function filterForDefaultManifests(files: string[]): string[] {
