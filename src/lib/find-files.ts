@@ -82,6 +82,10 @@ export async function find(
         foundAll.push(fileFound);
       }
     }
+    const filteredOutFiles = foundAll.filter((f) => !found.includes(f));
+    if (filteredOutFiles.length) {
+      debug(`Filtered out ${filteredOutFiles.length}/${foundAll.length} files: ${foundAll.join(', ')}`);
+    }
     return { files: filterForDefaultManifests(found), allFilesFound: foundAll };
   } catch (err) {
     throw new Error(`Error finding files in path '${path}'.\n${err.message}`);
