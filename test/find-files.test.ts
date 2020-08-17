@@ -6,7 +6,7 @@ const testFixture = path.join(__dirname, 'fixtures', 'find-files');
 
 test('find all files in test fixture', async (t) => {
   // six levels deep to find all
-  const { files: result } = await find(testFixture, [], [], 6);
+  const { files: result, allFilesFound } = await find(testFixture, [], [], 6);
   const expected = [
     path.join(testFixture, 'README.md'),
     path.join(
@@ -35,6 +35,7 @@ test('find all files in test fixture', async (t) => {
     path.join(testFixture, 'ruby', 'test.txt'),
     path.join(testFixture, 'yarn', 'yarn.lock'),
   ].sort();
+  t.same(allFilesFound.sort(), expected, 'should return all unfiltered files');
   t.same(result.sort(), expected, 'should return all files');
 });
 
